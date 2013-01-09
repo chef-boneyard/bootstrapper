@@ -25,3 +25,19 @@ though most users simply wish to customize the install process. By
 separating config generation, installation, and SSH session handling,
 each piece of functionality can be re-used or customized in isolation.
 
+## Using It
+
+Use of this code is only recommended for users with experience writing
+knife plugins, on a test/development basis only.
+
+Knife currently supports only a single user plugins directory (more
+plugins can be installed as rubygems, though this code is not ready for
+that kind of release). To install the `knife strap` command, clone this
+repo to `~/.chef/plugins/bootstrapper`, then create a stub plugin in
+`~/.chef/plugins/knife/strap.rb`:
+
+    load File.expand_path("../../bootstrapper/bin/strap.rb", __FILE__)
+
+## License:
+Apache 2 License.
+
