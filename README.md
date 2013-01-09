@@ -16,7 +16,7 @@ is on the roadmap for Chef server, so it's better to use everyone's real
 identity than rely on the more-or-less anonymous validator.
 * Use SCP to install configuration: The current bootstrap passes all
 data in via a single bash command, which means sensitive data is visible
-in the argv0 of the bootstrap process. Bootstrapper, by, contrast, uses
+in the argv of the bootstrap process. Bootstrapper, by, contrast, uses
 SCP to copy credentials to the remote node.
 * Modular design: The current boostrap relies on templated shell scripts
 for customization. This results in a ton of copy-pasta'd code, since the
