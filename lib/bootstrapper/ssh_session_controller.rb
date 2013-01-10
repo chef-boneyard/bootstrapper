@@ -48,6 +48,7 @@ module Bootstrapper
           raise ExecuteFailure, "Cannot execute (on #{remote_host}) command `#{command}'" unless success
           ch.on_data do |ichannel, data|
             # TODO: stream this the right way.
+            # TODO: detect incorrect sudo password and deal with it.
             if data =~ /^SUDO PASSWORD FOR/
               ichannel.send_data("#{get_password}\n")
             else
