@@ -23,7 +23,7 @@ module Bootstrapper
 
     def connect
       attempts ||= 0
-      log.debug "Connecting to cloud_server: #{ssh_options}"
+      log.debug "Connecting to cloud_server: #{config.printable_ssh_config}"
       Net::SSH.start(*ssh_options) do |ssh|
         yield SSHSessionController.new(ui, ssh, config)
       end

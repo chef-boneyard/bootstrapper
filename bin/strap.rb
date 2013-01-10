@@ -41,14 +41,16 @@ module Kallistec
       :default => true
 
     def run
-      unless uri = name_args[0]
-        ui.error "You must supply a hostname to bootstrap"
+      unless hostspec = name_args[0]
+        ui.error "You must supply a hostname (with optional 'user@') to bootstrap"
         exit 1
       end
 
       bootstrapper = Bootstrapper::Controller.new(ui)
       bootstrapper.configure do |c|
-        c.uri = uri
+        c.hostspec = hostspec
+        c.apply_chef_config(Chef::Config)
+        c.apply_knife_config(config)
       end
 
       bootstrapper.run
