@@ -15,7 +15,7 @@ module Bootstrapper
     def install_script
       <<-SCRIPT
 set -x
-bash <(wget http://opscode.com/chef/install.sh --no-check-certificate -O -) -v 10.16.4
+bash <(wget https://www.opscode.com/chef/install.sh -O -) -v 10.16.4
 SCRIPT
     end
 
