@@ -1,9 +1,10 @@
 # BOOTSTRAPPER
 
 Bootstrapper is an in-progress replacement for Chef's `knife bootstrap`.
-As of now, it can install chef on a remote box (but does not run it).
-All SSH options that `knife bootstrap` supports are working, with the
-exception of SSH gateway support.
+
+**NOTE:** Big changes are in progress. Because there aren't yet any
+tests, I don't know if/how things are broken, but I assume that they
+are.
 
 ## Goals
 

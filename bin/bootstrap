@@ -1,16 +1,16 @@
-module Kallistec
+#!/usr/bin/env ruby
 
-  class Strap < Chef::Knife
+require 'thor'
+require 'net/ssh'
+require 'net/scp'
 
-    deps do
-      require 'net/ssh'
-      require 'net/scp'
+$:.unshift File.expand_path("../../lib", __FILE__)
+require "bootstrapper"
 
-      $:.unshift File.expand_path("../../lib", __FILE__)
-      require "bootstrapper"
-    end
 
-    banner "knife strap [user@]hostname [OPTIONS]"
+module Bootstrapper
+
+  class CLI < Thor
 
     option :ssh_password,
       :short => "-P PASSWORD",
@@ -40,8 +40,9 @@ module Kallistec
       :boolean => true,
       :default => true
 
-    def run
-      unless hostspec = name_args[0]
+    desc "box HOSTNAME", "run the bootstrap against HOSTNAME"
+    def box(hostspec)
+      unless hostspec
         ui.error "You must supply a hostname (with optional 'user@') to bootstrap"
         exit 1
       end
@@ -59,7 +60,4 @@ module Kallistec
   end
 end
 
-__END__
-TODO:
-  * inspect for all objects
-  * pp for all objects
+Bootstrapper::CLI.start(ARGV)
