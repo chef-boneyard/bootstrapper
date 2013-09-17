@@ -1,27 +1,16 @@
+require 'net/ssh'
+require 'net/scp'
+
+require 'bootstrapper/transport'
 
 module Bootstrapper
-  # == Bootstrapper::SSHSession::SessionController
-  # Wraps an SSH Session object and provides a simplified interface to
-  # running commands and scp-ing files.
-  #
-  # The underlying session object can be accessed via #session.
-  class SSHSessionController
+  # == Bootstrapper::SSH
+  # Provides a Transport implementation for SSH
+  class SSH < Transport
+
+    short_name(:ssh)
 
     class ExecuteFailure < ArgumentError
-    end
-
-    attr_reader :session
-    attr_reader :config
-    attr_reader :ui
-
-    def initialize(ui, session, config)
-      @ui = ui
-      @session = session
-      @config = config
-    end
-
-    def log
-      Chef::Log
     end
 
     def scp(io_or_string, path)
@@ -38,6 +27,7 @@ module Bootstrapper
       log.debug "Executing remote command: #{cmd}"
       result = session.exec!(cmd)
       log.debug "result: #{cmd}"
+      result
     end
 
     def pty_run(command)

@@ -3,7 +3,9 @@ module Bootstrapper
 
   # == Bootstrapper::ChefInstaller
   # Installs chef on the remote machine.
-  class ChefInstaller
+  class Omnibus < Installer
+
+    short_name(:omnibus)
 
     def setup_files(config_installer)
       config_installer.install_file("bootstrap script", "bootstrap.sh") do |f|
