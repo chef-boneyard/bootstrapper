@@ -1,11 +1,12 @@
+require 'bootstrapper/dsl_attr'
 module Bootstrapper
 
   class Definition
 
+    extend DSLAttr
+
     class UnknownComponent < StandardError
     end
-
-    NULL_ARG = Object.new
 
     def self.definitions_by_name
       @definitions_by_name ||= {}
@@ -27,10 +28,6 @@ module Bootstrapper
     end
 
     attr_reader :name
-    attr_accessor :desc
-    attr_accessor :transport
-    attr_accessor :installer
-    attr_accessor :config_generator
 
     def initialize(name)
       @name = name
@@ -38,6 +35,23 @@ module Bootstrapper
       @installer = nil
       @config_generator = nil
     end
+
+    dsl_attr :desc
+
+    attr_writer :transport
+    def transport(name=NULL_ARG, &base_config)
+      if name.equal?(NULL_ARG)
+        @transport
+      else
+        @transport = name
+        # validate it?
+        base_config.call(transport_options) if block_given?
+        @transport
+      end
+    end
+    dsl_attr :installer
+    dsl_attr :config_generator
+
 
     def transport_class
       Transport.find(transport) or
@@ -52,6 +66,10 @@ module Bootstrapper
     def config_generator_class
       ConfigGenerator.find(config_generator) or
         raise UnknownComponent, "Can't load config generator type `#{config_generator}'"
+    end
+
+    def transport_options
+      @transport_options ||= transport_class.config_object
     end
   end
 

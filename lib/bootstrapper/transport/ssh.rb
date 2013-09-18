@@ -10,6 +10,26 @@ module Bootstrapper
 
     short_name(:ssh)
 
+    option :password,
+      :type => :string,
+      :desc => "The ssh password"
+
+    option :port,
+      :type => :numeric,
+      :desc => "The ssh port"
+
+    option :gateway,
+      :type => :string,
+      :desc => "The ssh gateway"
+
+    option :identity_file,
+      :type => :string,
+      :desc => "The SSH identity file used for authentication"
+
+    option :host_key_verify,
+      :type => :boolean,
+      :default => true
+
     class ExecuteFailure < ArgumentError
     end
 

@@ -4,7 +4,7 @@ module Bootstrapper
     @@installer_classes = {}
 
     def self.short_name(short_name)
-      @@installer_classes[short_name] = short_name
+      @@installer_classes[short_name] = self
     end
 
     def self.find(short_name)

@@ -1,6 +1,9 @@
+require 'bootstrapper/component_options'
 
 module Bootstrapper
   class Transport
+
+    extend Bootstrapper::ComponentOptions
 
     @@transport_classes = {}
 

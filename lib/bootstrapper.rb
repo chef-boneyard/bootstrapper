@@ -1,5 +1,9 @@
 module Bootstrapper
 
+  # Unique object that can be used as a default argument for "DSL style"
+  # setters to differentiate from nil.
+  NULL_ARG = Object.new
+
   def self.define(bootstrap_strategy_name, &block)
     Definition.create(bootstrap_strategy_name, &block)
   end

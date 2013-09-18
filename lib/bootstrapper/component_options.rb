@@ -1,3 +1,4 @@
+require 'bootstrapper/dsl_attr'
 module Bootstrapper
 
   # == Bootstrapper::ComponentOptions
@@ -15,12 +16,18 @@ module Bootstrapper
     end
 
     def option(name, meta_options={})
-      @config_object_class = nil
+      config_object_class.dsl_attr(name)
       options << [name, meta_options]
+      name
     end
 
     def config_object_class
-      @config_object_class ||= Struct.new(*(options.map(&:first)))
+      @config_object_class ||= begin
+        config_class = Class.new
+        config_class.extend(DSLAttr)
+        self.const_set(:ConfigOptions, config_class)
+        config_class
+      end
     end
 
     def config_object

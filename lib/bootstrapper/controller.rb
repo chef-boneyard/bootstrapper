@@ -29,7 +29,8 @@ module Bootstrapper
       # this is where cloudy stuff would go...
       prepare_config
       prepare_installers
-      ssh = configure_ssh_session
+
+      #ssh = configure_ssh_session
 
       ssh.connect do |session|
         log.debug "Installing config files"
