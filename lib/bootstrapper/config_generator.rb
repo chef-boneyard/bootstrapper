@@ -1,4 +1,4 @@
-require 'chef/rest'
+require 'bootstrapper/component_options'
 
 module Bootstrapper
 

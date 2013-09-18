@@ -31,17 +31,17 @@ describe Bootstrapper::Definition do
 
   it "finds a transport class by short name" do
     definition.transport(:ssh)
-    expect(definition.transport_class).to eq(Bootstrapper::SSH)
+    expect(definition.transport_class).to eq(Bootstrapper::Transports::SSH)
   end
 
   it "finds an installer class by short name" do
     definition.installer(:omnibus)
-    expect(definition.installer_class).to eq(Bootstrapper::Omnibus)
+    expect(definition.installer_class).to eq(Bootstrapper::Installers::Omnibus)
   end
 
   it "finds a config generator class by short name" do
     definition.config_generator(:chef_client)
-    expect(definition.config_generator_class).to eq(Bootstrapper::ChefClient)
+    expect(definition.config_generator_class).to eq(Bootstrapper::ConfigGenerators::ChefClient)
   end
 
   it "yields config options for transport" do

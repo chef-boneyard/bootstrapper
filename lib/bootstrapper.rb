@@ -17,6 +17,6 @@ require 'bootstrapper/controller'
 require 'bootstrapper/definition'
 
 # Default drivers that we're hardcoding for now
-require 'bootstrapper/installer/omnibus'
-require 'bootstrapper/transport/ssh'
+require 'bootstrapper/installers/omnibus'
+require 'bootstrapper/transports/ssh'
 require 'bootstrapper/config_generators/chef_client'
