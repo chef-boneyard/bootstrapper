@@ -1,5 +1,10 @@
+require 'bootstrapper/dsl_attr'
+require 'bootstrapper/component_options'
+
 module Bootstrapper
   class Installer
+
+    extend ComponentOptions
 
     @@installer_classes = {}
 
@@ -19,9 +24,11 @@ module Bootstrapper
     short_name(:base)
 
     attr_reader :transport
+    attr_reader :options
 
-    def initialize(transport)
+    def initialize(transport, options)
       @transport = transport
+      @options = options
     end
 
     def install

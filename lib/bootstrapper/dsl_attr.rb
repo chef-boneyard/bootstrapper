@@ -1,5 +1,10 @@
 module Bootstrapper
 
+  # Unique object that can be used as a default argument for "DSL style"
+  # setters to differentiate from nil.
+  NULL_ARG = Object.new
+
+
   # == Bootstrapper::DSLAttr
   # Extends a class with a class method for defining "DSL attrs", which are
   # like attr_accessor except that they also support "DSL style" setters, that
