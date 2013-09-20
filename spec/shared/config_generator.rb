@@ -1,5 +1,10 @@
 shared_examples_for "A Config Generator" do
-  let(:config_generator) { described_class.new }
+  let(:options) { double("Options object") }
+  let(:config_generator) { described_class.new(options) }
+
+  it "has its options" do
+    expect(config_generator.options).to eq(options)
+  end
 
   it "keeps a list of files to install" do
     expect(config_generator.files_to_install).to be_empty
