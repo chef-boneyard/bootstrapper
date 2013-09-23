@@ -1,4 +1,6 @@
 require 'chef/rest'
+require 'chef/api_client'
+require 'securerandom'
 require 'bootstrapper/config_generator'
 module Bootstrapper
   module ConfigGenerators
@@ -14,6 +16,15 @@ module Bootstrapper
 
       short_name(:chef_client)
 
+      option(:chef_server_url)
+      option(:username)
+      option(:chef_api_key)
+
+      option(:node_name)
+
+      attr_reader :client
+      attr_reader :node
+
       # TODO: extract code to here from base as necessary
 
       def prepare
@@ -26,7 +37,7 @@ module Bootstrapper
       # Name for the client/node pair to be created
       # TODO: Should get this from FQDN or -N option, timestamp works for testing purposes.
       def entity_name
-        @entity_name ||= Time.new.strftime("%Y-%M-%d-%H-%M-%S")
+        @entity_name ||= Time.new.utc.strftime("%Y-%M-%d-%H-%M-%S")
       end
 
 
@@ -38,7 +49,11 @@ module Bootstrapper
       ############################################################
 
       def chef_api
-        Chef::REST.new(Chef::Config[:chef_server_url])
+        Chef::REST.new(options.chef_server_url, options.username, chef_api_key)
+      end
+
+      def chef_api_key
+        File.expand_path(options.chef_api_key)
       end
 
       def sanity_check
@@ -67,15 +82,11 @@ module Bootstrapper
 
       def create_client
         return @client unless @client.nil?
-        api_response = chef_api.post('clients', :name => entity_name, :admin => false)
-        @client = Chef::ApiClient.new.tap do |c|
-          c.name entity_name
-          c.admin false
-          c.private_key api_response['private_key']
-        end
+        # Chef 11 servers only
+        @client = chef_api.post('clients', :name => entity_name, :admin => false)
         ui.msg "Created client '#{@client.name}'"
 
-        config_installer.install_file("client key", "client.pem") do |f|
+        install_file("client key", "client.pem") do |f|
           f.content = @client.private_key
           f.mode = "0600"
         end
@@ -83,7 +94,7 @@ module Bootstrapper
       end
 
       def create_node
-        chef_api_as_new_client = Chef::REST.new(Chef::Config[:chef_server_url], entity_name, nil, :raw_key => client.private_key)
+        chef_api_as_new_client = Chef::REST.new(options.chef_server_url, entity_name, nil, :raw_key => client.private_key)
         @node = Chef::Node.build(entity_name)
         # TODO: wire up user-supplied run_list
         @node.run_list("recipe[tmux]")
@@ -105,8 +116,8 @@ module Bootstrapper
       end
 
       def stage_files(ssh_session)
-        log.debug "Making config staging dir #{tempdir}"
-        ssh_session.run("mkdir -m 0700 #{@tempdir}")
+        log.debug "Making config staging dir #{staging_dir}"
+        ssh_session.run("mkdir -m 0700 #{@staging_dir}")
 
         files_to_install.each do |file|
           staging_path = temp_path(file.rel_path)
@@ -119,11 +130,11 @@ module Bootstrapper
         log.debug("Creating Chef config directory /etc/chef")
         # TODO: don't hardcode sudo
         ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT))
-  bash -c '
-    mkdir -p -m 0700 /etc/chef
-    chown root:root /etc/chef
-    chmod 0755 /etc/chef
-  '
+bash -c '
+  mkdir -p -m 0700 /etc/chef
+  chown root:root /etc/chef
+  chmod 0755 /etc/chef
+'
   SCRIPT
         files_to_install.each do |file|
           # TODO: support paths outside /etc/chef?
@@ -132,21 +143,22 @@ module Bootstrapper
 
           # TODO: don't hardcode sudo
           ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT))
-  bash -c '
-    mv #{temp_path(file.rel_path)} #{final_path}
-    chown root:root #{final_path}
-    chmod #{file.mode} #{final_path}
-  '
+bash -c '
+  mv #{temp_path(file.rel_path)} #{final_path}
+  chown root:root #{final_path}
+  chmod #{file.mode} #{final_path}
+'
   SCRIPT
         end
       end
 
-      def tempdir
-        @tempdir ||= "/tmp/chef-bootstrap-#{rand(2 << 128).to_s(16)}"
+      def staging_dir
+        slug = SecureRandom.hex(16)
+        @staging_dir ||= "/tmp/chef-bootstrap-#{slug}"
       end
 
       def temp_path(rel_path)
-        File.join(tempdir, rel_path)
+        File.join(staging_dir, rel_path)
       end
     end
 

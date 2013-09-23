@@ -1,6 +1,11 @@
 shared_examples_for "A Config Generator" do
   let(:options) { double("Options object") }
-  let(:config_generator) { described_class.new(options) }
+  let(:ui) { double("UI Object") }
+  let(:config_generator) { described_class.new(ui, options) }
+
+  it "has the UI object" do
+    expect(config_generator.ui).to eq(ui)
+  end
 
   it "has its options" do
     expect(config_generator.options).to eq(options)

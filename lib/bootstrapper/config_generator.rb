@@ -37,8 +37,10 @@ module Bootstrapper
 
     attr_reader :files_to_install
     attr_reader :options
+    attr_reader :ui
 
-    def initialize(options)
+    def initialize(ui, options)
+      @ui = ui
       @options = options
       @files_to_install = []
     end
