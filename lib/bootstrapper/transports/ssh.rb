@@ -29,19 +29,19 @@ module Bootstrapper
       # TODO: infer this from root/not-root username?
       option :sudo,
         :type => :boolean,
-        :desc => "whether to use sudo"
+        :desc => "Use sudo to run as root"
 
       option :password,
         :type => :string,
-        :desc => "The ssh password"
+        :desc => "The SSH password"
 
       option :port,
         :type => :numeric,
-        :desc => "The ssh port"
+        :desc => "The SSH port"
 
-      option :gateway,
-        :type => :string,
-        :desc => "The ssh gateway"
+      # option :gateway,
+      #   :type => :string,
+      #   :desc => "The ssh gateway"
 
       option :identity_file,
         :type => :string,
@@ -53,7 +53,7 @@ module Bootstrapper
 
       option :multi_host,
         :type => :boolean,
-        :desc => "Whether to optimize output for multiple hosts"
+        :desc => "Optimize output for multiple hosts"
 
       def connect
         attempts ||= 0
@@ -100,10 +100,11 @@ module Bootstrapper
       end
 
       def printable_ssh_config
-        if net_ssh_config[2].key?(:password) && !net_ssh_config[2][:password].nil?
-          net_ssh_config[2][:password] = "***Password Concealed**"
+        config = net_ssh_config.dup
+        if config[2].key?(:password) && !config[2][:password].nil?
+          config[2][:password] = "***Password Concealed***"
         end
-        net_ssh_config
+        config
       end
 
     end
