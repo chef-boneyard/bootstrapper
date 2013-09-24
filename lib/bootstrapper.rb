@@ -6,7 +6,6 @@ module Bootstrapper
 end
 
 # Load Core/Base classes:
-require 'bootstrapper/config'
 require 'bootstrapper/installer'
 require 'bootstrapper/config_generator'
 require 'bootstrapper/controller'

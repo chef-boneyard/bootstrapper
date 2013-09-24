@@ -1,4 +1,5 @@
 require 'bootstrapper/component_options'
+require 'chef/log'
 
 module Bootstrapper
   class Transport
@@ -15,26 +16,16 @@ module Bootstrapper
       @@transport_classes[short_name]
     end
 
-    attr_reader :session
-    attr_reader :config
+    attr_reader :options
     attr_reader :ui
-
-    def initialize(ui, session, config)
-      @ui = ui
-      @session = session
-      @config = config
-    end
 
     def log
       Chef::Log
     end
 
-    def scp(io_or_string, remote_path)
-      raise NotImplementedError
-    end
-
-    def pty_run(command)
-      raise NotImplementedError
+    def initialize(ui, options)
+      @ui = ui
+      @options = options
     end
 
   end
