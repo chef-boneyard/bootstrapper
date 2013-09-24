@@ -28,6 +28,10 @@ module Bootstrapper
       @options = options
     end
 
+    def connect
+      raise NotImplementedError
+    end
+
   end
 
 end
