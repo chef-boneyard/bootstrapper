@@ -49,8 +49,30 @@ module Bootstrapper
         @transport
       end
     end
-    dsl_attr :installer
-    dsl_attr :config_generator
+
+    attr_writer :installer
+    def installer(name=NULL_ARG, &base_config)
+      if name.equal?(NULL_ARG)
+        @installer
+      else
+        @installer = name
+        # validate it?
+        base_config.call(installer_options) if block_given?
+        @installer
+      end
+    end
+
+    attr_writer :config_generator
+    def config_generator(name=NULL_ARG, &base_config)
+      if name.equal?(NULL_ARG)
+        @config_generator
+      else
+        @config_generator = name
+        # validate it?
+        base_config.call(config_generator_options) if block_given?
+        @config_generator
+      end
+    end
 
 
     def transport_class
@@ -70,6 +92,14 @@ module Bootstrapper
 
     def transport_options
       @transport_options ||= transport_class.config_object
+    end
+
+    def installer_options
+      @installer_options ||= installer_class.config_object
+    end
+
+    def config_generator_options
+      @config_generator_options ||= config_generator_class.config_object
     end
   end
 

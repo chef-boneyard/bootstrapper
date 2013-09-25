@@ -14,15 +14,27 @@ module Bootstrapper
     end
 
     def config_generator
-      @config_generator ||= definition.config_generator_class.new
+      @config_generator ||= definition.config_generator_class.new(ui, config_generator_options)
+    end
+
+    def config_generator_options
+      definition.config_generator_options
     end
 
     def transport
-      @transport ||= definition.transport_class.new(ui)
+      @transport ||= definition.transport_class.new(ui, transport_options)
+    end
+
+    def transport_options
+      definition.transport_options
     end
 
     def installer
-      @installer ||= definition.installer_class.new(ui, transport)
+      @installer ||= definition.installer_class.new(ui, installer_options)
+    end
+
+    def installer_options
+      definition.installer_options
     end
 
     def run
@@ -32,23 +44,20 @@ module Bootstrapper
 
       #ssh = configure_ssh_session
 
-      ssh.connect do |session|
-        log.debug "Installing config files"
-        config_installer.install_config(session)
-        log.debug "Executing installer..."
-        chef_installer.install(session)
+      transport.connect do |session|
+        ui.msg( "Installing config files" )
+        config_generator.install_config(session)
+        ui.msg( "Executing installer..." )
+        installer.install(session)
       end
     end
-
-
 
     def prepare_config
       config_generator.prepare
     end
 
     def prepare_installers
-      chef_installer = ChefInstaller.new
-      chef_installer.setup_files(config_installer)
+      installer.setup_files(config_generator)
     end
 
     def configure_ssh_session

@@ -83,7 +83,16 @@ module Bootstrapper
       def create_client
         return @client unless @client.nil?
         # Chef 11 servers only
-        @client = chef_api.post('clients', :name => entity_name, :admin => false)
+        response = chef_api.post('clients', :name => entity_name, :admin => false)
+        @client = if response.kind_of?(Chef::ApiClient)
+          response
+        else
+          Chef::ApiClient.new.tap do |c|
+            c.name(entity_name)
+            c.private_key(response["private_key"])
+          end
+        end
+
         ui.msg "Created client '#{@client.name}'"
 
         install_file("client key", "client.pem") do |f|

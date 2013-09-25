@@ -60,7 +60,7 @@ module Bootstrapper
             ui.msg(str)
           end
         else
-          ui.msg(data)
+          ui.stdout.print(data)
         end
       end
 
