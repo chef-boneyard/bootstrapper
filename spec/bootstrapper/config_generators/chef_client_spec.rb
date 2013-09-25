@@ -20,7 +20,7 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
     end
 
     it "configures the chef server username" do
-      expect(Bootstrapper::ConfigGenerators::ChefClient.options).to include([:username, {}])
+      expect(Bootstrapper::ConfigGenerators::ChefClient.options).to include([:chef_username, {}])
     end
 
     it "configures the chef API key" do
@@ -48,7 +48,7 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
 
   describe "generating resources on the chef server" do
     let(:chef_server_url) { "http://localhost:22222" }
-    let(:username) { "deuce" }
+    let(:chef_username) { "deuce" }
     let(:chef_api_key_short) { "~/.chef/deuce.pem" }
     let(:chef_api_key) { File.expand_path(chef_api_key_short) }
     let(:chef_http_client) { double(Chef::REST) }
@@ -65,10 +65,10 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
       exception_404
 
       options.chef_server_url = chef_server_url
-      options.username = username
+      options.chef_username = chef_username
       options.chef_api_key = chef_api_key_short
 
-      Chef::REST.stub(:new).with(chef_server_url, username, chef_api_key).
+      Chef::REST.stub(:new).with(chef_server_url, chef_username, chef_api_key).
         and_return(chef_http_client)
     end
 

@@ -54,6 +54,26 @@ describe Bootstrapper::Definition do
     expect(transport_opts.identity_file).to eq("/tmp/foo")
   end
 
+  it "yields config options for config generation" do
+    definition.config_generator(:chef_client) do |chef|
+      chef.chef_server_url = "https://api.opscode.com/organizations/example"
+      chef.chef_username = "charlie"
+      chef.chef_api_key = "~/.chef/charlie.pem"
+    end
+    config_generator_opts = definition.config_generator_options
+    expect(config_generator_opts.chef_server_url).to eq("https://api.opscode.com/organizations/example")
+    expect(config_generator_opts.chef_username).to eq("charlie")
+    expect(config_generator_opts.chef_api_key).to eq("~/.chef/charlie.pem")
+  end
+
+  it "yields config options for the installer" do
+    definition.installer(:omnibus) do |omnibus|
+      omnibus.bootstrap_version = "11.6.0"
+    end
+    installer_opts = definition.installer_options
+    expect(installer_opts.bootstrap_version).to eq("11.6.0")
+  end
+
   describe "when loading a definition file" do
 
     it "returns the name of the definition it loaded" do

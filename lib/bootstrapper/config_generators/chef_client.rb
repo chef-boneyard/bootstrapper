@@ -17,7 +17,7 @@ module Bootstrapper
       short_name(:chef_client)
 
       option(:chef_server_url)
-      option(:username)
+      option(:chef_username)
       option(:chef_api_key)
 
       option(:node_name)
@@ -49,7 +49,7 @@ module Bootstrapper
       ############################################################
 
       def chef_api
-        Chef::REST.new(options.chef_server_url, options.username, chef_api_key)
+        Chef::REST.new(options.chef_server_url, options.chef_username, chef_api_key)
       end
 
       def chef_api_key
