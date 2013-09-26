@@ -8,8 +8,12 @@ module Bootstrapper
 
     @@transport_classes = {}
 
-    def self.short_name(short_name)
-      @@transport_classes[short_name] = self
+    def self.short_name(short_name=NULL_ARG)
+      unless short_name.equal?(NULL_ARG)
+        @short_name = short_name
+        @@transport_classes[short_name] = self
+      end
+      @short_name
     end
 
     def self.find(short_name)

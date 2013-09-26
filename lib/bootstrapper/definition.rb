@@ -1,4 +1,6 @@
 require 'bootstrapper/dsl_attr'
+require 'bootstrapper/cli'
+
 module Bootstrapper
 
   class Definition
@@ -21,10 +23,11 @@ module Bootstrapper
     end
 
     def self.create(name, &block)
-      d = new(name)
-      block.call(d) if block_given?
-      register(name, d)
-      d
+      definition = new(name)
+      block.call(definition) if block_given?
+      register(name, definition)
+      CLI.define_bootstrap(definition)
+      name
     end
 
     attr_reader :name
@@ -101,6 +104,28 @@ module Bootstrapper
     def config_generator_options
       @config_generator_options ||= config_generator_class.config_object
     end
+
+    def transport_option_list
+      transport_class.options
+    end
+
+    def installer_option_list
+      installer_class.options
+    end
+
+    def config_generator_option_list
+      config_generator_class.options
+    end
+
+    def cli_options
+      option_classes = [ transport_option_list,
+                         installer_option_list,
+                         config_generator_option_list ]
+      option_classes.inject([]) do |combined_opts, option_list|
+        combined_opts + option_list
+      end
+    end
+
   end
 
 end

@@ -31,7 +31,11 @@ module Bootstrapper
       @options = options
     end
 
-    def install
+    def setup_files(config_generator)
+      raise NotImplementedError
+    end
+
+    def install(transport)
       raise NotImplementedError
     end
 

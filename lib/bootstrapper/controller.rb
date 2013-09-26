@@ -42,8 +42,6 @@ module Bootstrapper
       prepare_config
       prepare_installers
 
-      #ssh = configure_ssh_session
-
       transport.connect do |session|
         ui.msg( "Installing config files" )
         config_generator.install_config(session)

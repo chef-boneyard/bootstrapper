@@ -1,5 +1,5 @@
 # Example of what a bootstrap definition might look like...
-Bootstrapper.define(:standard) do |bootstrap|
+Bootstrapper.define(:omnibus_unix) do |bootstrap|
   bootstrap.desc = "UNIX/SSH bootstrap"
   bootstrap.transport(:ssh) do |ssh|
     ssh.host = "192.168.99.134"
