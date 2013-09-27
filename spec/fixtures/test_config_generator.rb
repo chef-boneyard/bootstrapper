@@ -10,10 +10,13 @@ module Bootstrapper
              :type => :string,
              :desc => "A configurable opt for a config generator"
 
+      attr_reader :install_config_ran
+
       def prepare
       end
 
       def install_config(transport)
+        @install_config_ran = true
       end
 
     end

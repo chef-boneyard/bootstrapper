@@ -1,5 +1,4 @@
 require 'bootstrapper/dsl_attr'
-require 'bootstrapper/cli'
 
 module Bootstrapper
 
@@ -26,7 +25,6 @@ module Bootstrapper
       definition = new(name)
       block.call(definition) if block_given?
       register(name, definition)
-      CLI.define_bootstrap(definition)
       name
     end
 

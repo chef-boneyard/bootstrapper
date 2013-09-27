@@ -41,9 +41,14 @@ describe Bootstrapper::CLI do
       let(:argv) { %w[-f fixtures/example-definition.rb example --installer-opt foo --transport-opt bar --config-generator-opt baz] }
 
       it "loads the file and executes the bootstrap" do
-        Dir.chdir(spec_root) do
+        cli_instance = Dir.chdir(spec_root) do
           Bootstrapper::CLI.run(argv)
         end
+        expect(cli_instance.public_methods.map(&:to_s)).to include("example")
+        controller = cli_instance.controller
+        expect(controller.installer.install_ran).to be_true
+        expect(controller.config_generator.install_config_ran).to be_true
+        expect(controller.transport.connect_ran).to be_true
       end
     end
 
@@ -54,10 +59,6 @@ describe Bootstrapper::CLI do
         pending
       end
     end
-  end
-
-  it "generates a cli subcommand from a definition file" do
-    pending
   end
 
 end

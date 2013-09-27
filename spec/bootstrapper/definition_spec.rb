@@ -75,13 +75,17 @@ describe Bootstrapper::Definition do
   end
 
   describe "when loading a definition file" do
-
-    it "returns the name of the definition it loaded" do
-      pending
+    before do
+      definition = nil
+      Bootstrapper::Definition.create(:register_test) do |defn|
+        definition = defn
+        # definition code here
+      end
+      @definition = definition
     end
 
     it "registers the definition name globally" do
-      pending
+      expect(Bootstrapper::Definition.definitions_by_name[:register_test]).to eq(@definition)
     end
   end
 

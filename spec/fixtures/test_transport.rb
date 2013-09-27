@@ -28,7 +28,10 @@ module Bootstrapper
              :type => :string,
              :desc => "Sets an option for test transport"
 
+      attr_reader :connect_ran
+
       def connect
+        @connect_ran = true
         @session = TestTransportSession.new(ui, :transport_session, options)
         yield @session
       end

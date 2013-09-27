@@ -12,9 +12,34 @@ module Bootstrapper
       private :start
     end
 
-    def self.run(argv)
+    def self.run(argv, config={})
       load_definition_if_given(argv)
-      start(argv)
+      load_all_definitions
+
+      # HACK :(
+      # Thor doesn't provide an easy way to get the instance back when
+      # running start (or to create it without running the command), so
+      # we have to copy-pasta some of Thor's code to hack this in.
+      #
+      instance = nil
+      config[:shell] ||= Thor::Base.shell.new
+      dispatch(nil, argv.dup, nil, config) {|i| instance = i }
+      instance
+    rescue Thor::Error => e
+      ENV["THOR_DEBUG"] == "1" ? (raise e) : config[:shell].error(e.message)
+      exit(1) if exit_on_failure?
+    rescue Errno::EPIPE
+      # This happens if a thor command is piped to something like `head`,
+      # which closes the pipe when it's done reading. This will also
+      # mean that if the pipe is closed, further unnecessary
+      # computation will not occur.
+      exit(0)
+    end
+
+    def self.load_all_definitions
+      Definition.definitions_by_name.each do |name, definition|
+        define_bootstrap(definition)
+      end
     end
 
     def self.load_definition_if_given(argv)
@@ -100,6 +125,8 @@ HINT
                  :type => :boolean,
                  :aliases => :h
 
+    attr_reader :controller
+
     no_commands do
 
       def run_bootstrap(definition)
@@ -107,8 +134,9 @@ HINT
 
         ui = Chef::Knife::UI.new($stdout, $stderr, $stdin, {})
 
-        bootstrapper = Bootstrapper::Controller.new(ui, definition)
-        bootstrapper.run
+        @controller = Bootstrapper::Controller.new(ui, definition)
+        @controller.run
+        @controller
       end
 
     end
