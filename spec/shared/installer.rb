@@ -17,8 +17,12 @@ shared_examples_for "A Chef Installer" do
     expect(installer.options).to eql(options)
   end
 
-  it "implements :install" do
+  it "implements #install" do
     expect(installer).to respond_to(:install)
+  end
+
+  it "implements #setup_files" do
+    expect(installer).to respond_to(:setup_files)
   end
 end
 
