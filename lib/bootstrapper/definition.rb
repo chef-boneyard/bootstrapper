@@ -4,8 +4,6 @@ module Bootstrapper
 
   class Definition
 
-    extend DSLAttr
-
     class UnknownComponent < StandardError
     end
 
@@ -32,12 +30,20 @@ module Bootstrapper
 
     def initialize(name)
       @name = name
+      @desc = nil
       @transport = nil
       @installer = nil
       @config_generator = nil
     end
 
-    dsl_attr :desc
+    attr_writer :desc
+    def desc(desc_string=NULL_ARG)
+      if desc_string.equal?(NULL_ARG)
+        @desc
+      else
+        @desc = desc_string
+      end
+    end
 
     attr_writer :transport
     def transport(name=NULL_ARG, &base_config)

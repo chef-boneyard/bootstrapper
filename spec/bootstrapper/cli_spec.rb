@@ -39,17 +39,32 @@ describe Bootstrapper::CLI do
     end
     context "when given a definition file" do
       let(:argv) { %w[-f fixtures/example-definition.rb example --installer-opt foo --transport-opt bar --config-generator-opt baz] }
+      let(:cli_instance) { @cli_instance }
+      let(:controller) { cli_instance.controller }
 
-      it "loads the file and executes the bootstrap" do
-        cli_instance = Dir.chdir(spec_root) do
+      before do
+        @cli_instance = Dir.chdir(spec_root) do
           Bootstrapper::CLI.run(argv)
         end
+      end
+
+      it "defines the bootstrap as a command" do
         expect(cli_instance.public_methods.map(&:to_s)).to include("example")
-        controller = cli_instance.controller
+      end
+
+      it "applies CLI options to the configuration" do
+        expect(controller.installer_options.installer_opt).to eq("foo")
+        expect(controller.transport_options.transport_opt).to eq("bar")
+        expect(controller.config_generator_options.config_generator_opt).to eq("baz")
+      end
+
+      it "runs the bootstrap" do
         expect(controller.installer.install_ran).to be_true
         expect(controller.config_generator.install_config_ran).to be_true
         expect(controller.transport.connect_ran).to be_true
       end
+
+
     end
 
     context "when given a command to load a known bootstrap definition" do

@@ -3,10 +3,12 @@ module Bootstrapper
 
     attr_reader :ui
     attr_reader :definition
+    attr_reader :cli_options
 
-    def initialize(ui, definition)
+    def initialize(ui, definition, cli_options)
       @ui = ui
       @definition = definition
+      @cli_options = cli_options
     end
 
     def log
@@ -38,6 +40,7 @@ module Bootstrapper
     end
 
     def run
+      apply_cli_options!
       # this is where cloudy stuff would go...
       prepare_config
       prepare_installers
@@ -60,6 +63,12 @@ module Bootstrapper
 
     def configure_ssh_session
       @ssh ||= SSHSession.new(ui, config)
+    end
+
+    def apply_cli_options!
+      [installer_options, transport_options, config_generator_options].each do |component_options|
+        component_options.apply_cli_options!(cli_options)
+      end
     end
   end
 end

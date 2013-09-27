@@ -134,7 +134,7 @@ HINT
 
         ui = Chef::Knife::UI.new($stdout, $stderr, $stdin, {})
 
-        @controller = Bootstrapper::Controller.new(ui, definition)
+        @controller = Bootstrapper::Controller.new(ui, definition, options)
         @controller.run
         @controller
       end
