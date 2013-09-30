@@ -15,20 +15,36 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
 
   describe "configurable options" do
 
+    let(:options_collection) { Bootstrapper::ConfigGenerators::ChefClient.options }
+
     it "configures the chef server URL" do
-      expect(Bootstrapper::ConfigGenerators::ChefClient.options).to include([:chef_server_url, {}])
+      opts = {:type=>:string,
+              :desc=>"URL for your Chef server's API"}
+      expect(options_collection).to include([:chef_server_url, opts])
     end
 
     it "configures the chef server username" do
-      expect(Bootstrapper::ConfigGenerators::ChefClient.options).to include([:chef_username, {}])
+      opts = {:type=>:string,
+              :desc=>"Username of your account on the Chef server"}
+      expect(options_collection).to include([:chef_username, opts])
     end
 
     it "configures the chef API key" do
-      expect(Bootstrapper::ConfigGenerators::ChefClient.options).to include([:chef_api_key, {}])
+      opts = {:type => :string,
+              :desc => "Path to the API key for your user"}
+      expect(options_collection).to include([:chef_api_key, opts])
     end
 
     it "configures the desired node/client name" do
-      expect(Bootstrapper::ConfigGenerators::ChefClient.options).to include([:node_name, {}])
+      opts = {:type=>:string,
+              :desc=>"Name of the node to be created"}
+      expect(options_collection).to include([:node_name, opts])
+    end
+
+    it "configures the desired run_list" do
+      opts = {:type => :string,
+              :desc => "Comma separated list of roles/recipes to apply"}
+      expect(options_collection).to include([:run_list, opts])
     end
 
   end
@@ -74,6 +90,18 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
 
     it "has an authenticated Chef HTTP API client" do
       expect(config_generator.chef_api).to eq(chef_http_client)
+    end
+
+    it "builds a node using a run_list as a String" do
+      options.run_list = "recipe[tmux], role[base]"
+      node = config_generator.build_node
+      expect(node.run_list).to eq(%w{recipe[tmux] role[base]})
+    end
+
+    it "builds a node using a run_list as an Array" do
+      options.run_list = %w{recipe[apache2] role[webserver]}
+      node = config_generator.build_node
+      expect(node.run_list).to eq(%w{recipe[apache2] role[webserver]})
     end
 
     it "verifies that no node or client exists with the given name" do
