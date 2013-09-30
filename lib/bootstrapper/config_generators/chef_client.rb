@@ -66,6 +66,10 @@ module Bootstrapper
         Chef::REST.new(options.chef_server_url, options.chef_username, chef_api_key)
       end
 
+      def chef_api_as_new_client
+        Chef::REST.new(options.chef_server_url, entity_name, nil, :raw_key => client.private_key)
+      end
+
       def chef_api_key
         File.expand_path(options.chef_api_key)
       end
@@ -117,13 +121,29 @@ module Bootstrapper
       end
 
       def create_node
-        chef_api_as_new_client = Chef::REST.new(options.chef_server_url, entity_name, nil, :raw_key => client.private_key)
-        @node = Chef::Node.build(entity_name)
-        # TODO: wire up user-supplied run_list
-        @node.run_list("recipe[tmux]")
+        @node = build_node
         chef_api_as_new_client.post("nodes", @node)
         ui.msg "Created node '#{@node.name}'"
         @node
+      end
+
+      def build_node
+        node = Chef::Node.build(entity_name)
+        # TODO: wire up user-supplied run_list
+        node.run_list(normalized_run_list)
+        node
+      end
+
+      def normalized_run_list
+        run_list_spec = options.run_list
+        case run_list_spec
+        when nil
+          []
+        when String
+          run_list_spec.split(/\s*,\s*/)
+        when Array
+          run_list_spec
+        end
       end
 
       ############################################################

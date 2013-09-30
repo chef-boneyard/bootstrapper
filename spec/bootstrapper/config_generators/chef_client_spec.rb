@@ -92,6 +92,18 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
       expect(config_generator.chef_api).to eq(chef_http_client)
     end
 
+    it "builds a node using a run_list as a String" do
+      options.run_list = "recipe[tmux], role[base]"
+      node = config_generator.build_node
+      expect(node.run_list).to eq(%w{recipe[tmux] role[base]})
+    end
+
+    it "builds a node using a run_list as an Array" do
+      options.run_list = %w{recipe[apache2] role[webserver]}
+      node = config_generator.build_node
+      expect(node.run_list).to eq(%w{recipe[apache2] role[webserver]})
+    end
+
     it "verifies that no node or client exists with the given name" do
       chef_http_client.should_receive(:get).with("nodes/#{entity_name}").
         and_raise(exception_404)
