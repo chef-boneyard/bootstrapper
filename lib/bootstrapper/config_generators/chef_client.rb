@@ -16,11 +16,25 @@ module Bootstrapper
 
       short_name(:chef_client)
 
-      option(:chef_server_url)
-      option(:chef_username)
-      option(:chef_api_key)
+      option :chef_server_url,
+             :type => :string,
+             :desc => "URL for your Chef server's API"
 
-      option(:node_name)
+      option :chef_username,
+             :type => :string,
+             :desc => "Username of your account on the Chef server"
+
+      option :chef_api_key,
+             :type => :string,
+             :desc => "Path to the API key for your user"
+
+      option :node_name,
+             :type => :string,
+             :desc => "Name of the node to be created"
+
+      option :run_list,
+             :type => :string,
+             :desc => "Comma separated list of roles/recipes to apply"
 
       attr_reader :client
       attr_reader :node
