@@ -7,27 +7,28 @@ minimal. This means that when things go wrong, you may need to read the
 code to understand why. If you're uncomfortable with this, you should
 probably avoid using it for now.
 
+## Using It
 
-## Goals
+`bootstrapper` is only available via git for now. To install it:
 
-`knife bootstrap` exists and works, so why this?
+1. git clone
+2. bundle install
 
-* Bootstrap nodes without using the validator: By moving client and node
-creation up front (before SSH-ing in and running the installer),
-authentication issues and naming conflicts are found quickly and can be
-resolved ahead of time, automatically. In addition, server-side auditing
-is on the roadmap for Chef server, so it's better to use everyone's real
-identity than rely on the more-or-less anonymous validator.
-* Use SCP to install configuration: The current bootstrap passes all
-data in via a single bash command, which means sensitive data is visible
-in the argv of the bootstrap process. Bootstrapper, by, contrast, uses
-SCP to copy credentials to the remote node.
-* Modular design: The current boostrap relies on templated shell scripts
-for customization. This results in a ton of copy-pasta'd code, since the
-entire bootstrap process must be performed by the resulting script, even
-though most users simply wish to customize the install process. By
-separating config generation, installation, and SSH session handling,
-each piece of functionality can be re-used or customized in isolation.
+`bootstrapper` currently does not read any bootstrap definitions by
+default (this will change). To see the options available in the default
+bootstrap from your git clone:
+
+    bundle exec bin/bootstrap -f lib/bootstrapper/bootstraps/default.rb -h # lists all known boostrap commands
+    bundle exec bin/bootstrap -f lib/bootstrapper/bootstraps/default.rb omnibus-unix -h # shows options for omnibus-unix bootstrap
+
+
+Note that `bootstrapper` is a standalone CLI program. Though it is
+intended to be used with Chef, it does not read any standard Chef
+configuration files. The only mechanism to set default values is in a
+bootstrap definition file. Since this file is pure ruby code, you can
+hack in some logic to set the default values if you need to. This
+limitation may change in the future.
+
 
 ## Design
 
@@ -73,27 +74,26 @@ bootstrap is compiled into a subcommand, support for each option is
 added to the CLI, so that any option can be set on a per-invocation
 basis.
 
-## Using It
+## Goals
 
-`bootstrapper` is only available via git for now. To install it:
+`knife bootstrap` exists and works, so why this?
 
-1. git clone
-2. bundle install
-
-`bootstrapper` currently does not read any bootstrap definitions by
-default (this will change). To see the options available in the default
-bootstrap from your git clone:
-
-    bundle exec bin/bootstrap -f lib/bootstrapper/bootstraps/default.rb -h # lists all known boostrap commands
-    bundle exec bin/bootstrap -f lib/bootstrapper/bootstraps/default.rb omnibus-unix -h # shows options for omnibus-unix bootstrap
-
-
-Note that `bootstrapper` is a standalone CLI program. Though it is
-intended to be used with Chef, it does not read any standard Chef
-configuration files. The only mechanism to set default values is in a
-bootstrap definition file. Since this file is pure ruby code, you can
-hack in some logic to set the default values if you need to. This
-limitation may change in the future.
+* Bootstrap nodes without using the validator: By moving client and node
+creation up front (before SSH-ing in and running the installer),
+authentication issues and naming conflicts are found quickly and can be
+resolved ahead of time, automatically. In addition, server-side auditing
+is on the roadmap for Chef server, so it's better to use everyone's real
+identity than rely on the more-or-less anonymous validator.
+* Use SCP to install configuration: The current bootstrap passes all
+data in via a single bash command, which means sensitive data is visible
+in the argv of the bootstrap process. Bootstrapper, by, contrast, uses
+SCP to copy credentials to the remote node.
+* Modular design: The current boostrap relies on templated shell scripts
+for customization. This results in a ton of copy-pasta'd code, since the
+entire bootstrap process must be performed by the resulting script, even
+though most users simply wish to customize the install process. By
+separating config generation, installation, and SSH session handling,
+each piece of functionality can be re-used or customized in isolation.
 
 ## License:
 Apache 2 License.
