@@ -65,7 +65,8 @@ This may change in the future.
 Each bootstrap definition is compiled into a subcommand of the
 `bootstrap` command. For example, the default bootstrap definition in
 this source tree is named "omnibus_unix", so it is invoked by running
-(but see below for a caveat):
+(caveat: all bootstrap files must be loaded explicitly for now, see
+above):
 
     bootstrapper omnibus-unix [options]
 
