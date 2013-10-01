@@ -13,7 +13,9 @@ module Bootstrapper
 
     # == Bootstrapper::ComponentOptions::ComponentOptionCollection
     # Base class for a component's (transport, installer, config_generator)
-    # options.
+    # options. Generally it should not be necessary to modify this class
+    # directly; instead use the `option` method from ComponentOptions to define
+    # attributes on this object.
     class ComponentOptionCollection
 
       def self.configurables
@@ -49,10 +51,26 @@ module Bootstrapper
 
     end
 
+    # list of all defined options, along with their "option options".
+    # For example, given an option created like this:
+    #   option :volume, :desc => "Goes to 11"
+    # `options` looks like this:
+    #   [ [ :volume, {:desc => "Goes to 11"} ] ]
     def options
       @options ||= []
     end
 
+    # Defines a user-settable option `name` for the class. `meta_options` is an
+    # options Hash which is passed to Thor to control how the option is handled
+    # on the command line. Note that the :required setting doesn't include
+    # options set by a bootstrap definition file, so it's recommended not to
+    # use that. Also, `:type` coercion is not applied to options passed in via
+    # file, so treat it as advisory.
+    #
+    # === Example:
+    #   option :volume,
+    #          :desc => "goes to 11",
+    #          :type => :numeric
     def option(name, meta_options={})
       config_object_class.configurable(name)
       options << [name, meta_options]

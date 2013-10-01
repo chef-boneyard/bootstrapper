@@ -2,6 +2,39 @@ require 'bootstrapper/dsl_attr'
 
 module Bootstrapper
 
+  # == Bootstrapper::Definition
+  # Defines the components and default options used to bootstrap a
+  # remote machine with Chef.
+  #
+  # Definitions are created via a DSL. A definition specifies what
+  # transport is used to talk to the remote host (SSH, WinRM), what
+  # kind of configuration is generated (chef-client's client.rb and pem
+  # file), and how Chef is installed (omnibus, source, etc.). The DSL
+  # delegates each of these objects for the purpose of setting default
+  # options (so command lines are kept tidy).
+  #
+  # === Example
+  # The general format of a bootstrap definition is:
+  #
+  # Bootstrapper.define(:bootstrap_name) do |bootstrap|
+  #   bootstrap.desc = "Bootstraps Chef over sneakernet by FedExing a USB drive"
+  #   bootstrap.transport(:transport_type) do |transport|
+  #     transport.option = "value"
+  #     # etc.
+  #   end
+  #   bootstrap.installer(:installer_type) do |installer|
+  #     installer.option = "value"
+  #     # etc.
+  #   end
+  #   bootstrap.config_generator(:config_generator_type) do |config_generator|
+  #     config_generator.option = "value"
+  #     # etc.
+  #   end
+  # end
+  #
+  # The exact options available depend on the individual components
+  # used.
+  #
   class Definition
 
     class UnknownComponent < StandardError
@@ -19,6 +52,8 @@ module Bootstrapper
       definitions_by_name[name] = definition
     end
 
+    # Creates a bootstrap definition and stores it in the global list of
+    # bootstraps.
     def self.create(name, &block)
       definition = new(name)
       block.call(definition) if block_given?
@@ -26,6 +61,7 @@ module Bootstrapper
       name
     end
 
+    # Returns the name of the bootstrap.
     attr_reader :name
 
     def initialize(name)
@@ -36,7 +72,12 @@ module Bootstrapper
       @config_generator = nil
     end
 
-    attr_writer :desc
+    ############################################################################
+    # DSL
+    ############################################################################
+
+    # Set or return the short description of this bootstrap. This shows
+    # up in help output in the CLI.
     def desc(desc_string=NULL_ARG)
       if desc_string.equal?(NULL_ARG)
         @desc
@@ -44,8 +85,11 @@ module Bootstrapper
         @desc = desc_string
       end
     end
+    attr_writer :desc
 
-    attr_writer :transport
+    # Set or return the transport type for this bootstrap. If given a
+    # block, it yields an options object that allows you to set defaults
+    # for that transport type's options.
     def transport(name=NULL_ARG, &base_config)
       if name.equal?(NULL_ARG)
         @transport
@@ -56,8 +100,11 @@ module Bootstrapper
         @transport
       end
     end
+    attr_writer :transport
 
-    attr_writer :installer
+    # Set or return the installer type for this bootstrap. If given a
+    # block, it yields an options object that allows you to set defaults
+    # for that transport type's options.
     def installer(name=NULL_ARG, &base_config)
       if name.equal?(NULL_ARG)
         @installer
@@ -68,8 +115,11 @@ module Bootstrapper
         @installer
       end
     end
+    attr_writer :installer
 
-    attr_writer :config_generator
+    # Set or return the config generator type for this bootstrap. If
+    # given a block, it yields an options object that allows you to set
+    # defaults for that transport type's options.
     def config_generator(name=NULL_ARG, &base_config)
       if name.equal?(NULL_ARG)
         @config_generator
@@ -80,7 +130,11 @@ module Bootstrapper
         @config_generator
       end
     end
+    attr_writer :config_generator
 
+    ############################################################################
+    # Internal public API
+    ############################################################################
 
     def transport_class
       Transport.find(transport) or
