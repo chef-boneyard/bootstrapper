@@ -69,7 +69,7 @@ module Bootstrapper
       end
 
       def get_password
-        @password ||= ui.ask("sudo password for #{options.user}@#{remote_host}}:") { |q| q.echo = false }
+        @password ||= ui.ask("sudo password for #{options.user}@#{remote_host}:") { |q| q.echo = false }
       end
 
       def remote_host
