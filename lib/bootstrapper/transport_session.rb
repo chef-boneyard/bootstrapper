@@ -47,8 +47,11 @@ module Bootstrapper
     # implementation is responsible for displaying any prompts back to the user
     # and relaying user input.
     #
+    # If quiet mode is specified, command output is suppressed except when the
+    # remote host prompts for input.
+    #
     # Must be defined by subclasses.
-    def pty_run(command)
+    def pty_run(command, quiet=false)
       raise NotImplementedError
     end
 

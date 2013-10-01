@@ -53,6 +53,12 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
       expect(options_collection).to include([:environment, opts])
     end
 
+    it "enables debug output from chef-client" do
+      opts = {:type => :boolean,
+              :desc => "Run the initial chef-client run with -l debug" }
+      expect(options_collection).to include([:debug_chef, opts])
+    end
+
   end
 
   context "when no node name is specified" do
@@ -173,6 +179,18 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
     end
   end
 
+  describe "generating the client.rb" do
+    it "configures the node name" do
+      entity_name = config_generator.entity_name
+      expect(config_generator.client_rb).to include(%Q[node_name '#{entity_name}'])
+    end
+
+    it "configures the server URL" do
+      options.chef_server_url = "https://chef.example.com"
+      expect(config_generator.client_rb).to include(%Q[chef_server_url 'https://chef.example.com'])
+    end
+  end
+
   describe "installing configured files" do
     before do
       config_generator.install_file("testing", "test.sh") do |f|
@@ -208,7 +226,7 @@ bash -c '
 EOH
 
       transport.should_receive(:sudo).with(create_chef_dir).and_return("sudo #{create_chef_dir}")
-      transport.should_receive(:pty_run).with("sudo #{create_chef_dir}")
+      transport.should_receive(:pty_run).with("sudo #{create_chef_dir}", true)
 
       move_staged_file=<<-EOH
 bash -c '
@@ -220,7 +238,7 @@ EOH
 
       sudo_move_staged_file = "sudo #{move_staged_file}"
       transport.should_receive(:sudo).with(move_staged_file).and_return(sudo_move_staged_file)
-      transport.should_receive(:pty_run).with(sudo_move_staged_file)
+      transport.should_receive(:pty_run).with(sudo_move_staged_file, true)
 
       config_generator.install_staged_files(transport)
     end

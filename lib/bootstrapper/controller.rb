@@ -85,6 +85,7 @@ module Bootstrapper
         config_generator.install_config(session)
         ui.msg( "Executing installer..." )
         installer.install(session)
+        config_generator.run_chef(session, installer)
       end
     end
 

@@ -40,22 +40,42 @@ module Bootstrapper
              :type => :string,
              :desc => "Set the chef environment of the created node"
 
+      option :debug_chef,
+             :type => :boolean,
+             :desc => "Run the initial chef-client run with -l debug"
+
       attr_reader :client
       attr_reader :node
-
-      # TODO: extract code to here from base as necessary
 
       def prepare
         sanity_check
 
         create_client
         create_node
+
+        generate_client_rb
       end
 
       # Name for the client/node pair to be created
       # TODO: Should get this from FQDN or -N option, timestamp works for testing purposes.
       def entity_name
         @entity_name ||= Time.new.utc.strftime("%Y-%M-%d-%H-%M-%S")
+      end
+
+      def generate_client_rb
+        install_file("chef-client config file", "client.rb") do |file|
+          file.mode = "0644"
+          file.content = client_rb
+        end
+      end
+
+      # Generate a client.rb file as a String.
+      # TODO: expose this as a customizable string or template.
+      def client_rb
+        <<-CLIENT_RB
+node_name '#{entity_name}'
+chef_server_url '#{options.chef_server_url}'
+        CLIENT_RB
       end
 
 
@@ -175,9 +195,9 @@ module Bootstrapper
       end
 
       def install_staged_files(ssh_session)
-        log.debug("Creating Chef config directory /etc/chef")
+        ui.msg("Creating Chef config directory /etc/chef")
         # TODO: don't hardcode sudo
-        ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT))
+        ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT), true)
 bash -c '
   mkdir -p -m 0700 /etc/chef
   chown root:root /etc/chef
@@ -187,10 +207,10 @@ bash -c '
         files_to_install.each do |file|
           # TODO: support paths outside /etc/chef?
           final_path = File.join("/etc/chef", file.rel_path)
-          log.debug("moving staged #{file.description} to #{final_path}")
+          ui.msg("Installing #{file.description} to #{final_path}")
 
           # TODO: don't hardcode sudo
-          ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT))
+          ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT), true)
 bash -c '
   mv #{temp_path(file.rel_path)} #{final_path}
   chown root:root #{final_path}
@@ -208,6 +228,24 @@ bash -c '
       def temp_path(rel_path)
         File.join(staging_dir, rel_path)
       end
+
+      ############################################################
+      # Config installation.
+      #
+      # Installs config, creds, etc. to remote box.
+      ############################################################
+
+      def run_chef(transport, installer)
+        chef_command = installer.chef_client_command + chef_flags
+        transport.pty_run(transport.sudo(chef_command))
+      end
+
+      def chef_flags
+        flags = ""
+        flags << " -l debug" if options.debug_chef
+        flags
+      end
+
     end
 
   end

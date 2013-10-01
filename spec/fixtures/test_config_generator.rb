@@ -19,6 +19,9 @@ module Bootstrapper
         @install_config_ran = true
       end
 
+      def run_chef(transport, installer)
+      end
+
     end
   end
 end

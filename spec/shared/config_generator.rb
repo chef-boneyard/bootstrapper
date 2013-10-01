@@ -23,6 +23,10 @@ shared_examples_for "A Config Generator" do
     expect(config_generator).to respond_to(:install_config)
   end
 
+  it "implements a run_chef method" do
+    expect(config_generator).to respond_to(:run_chef)
+  end
+
   describe "when adding a file to the list of config files" do
     before do
       config_generator.install_file('data bag secret', "secret.pem") do |file|

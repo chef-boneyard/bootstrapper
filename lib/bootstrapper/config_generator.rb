@@ -103,6 +103,13 @@ module Bootstrapper
       raise NotImplementedError
     end
 
+    # Runs chef on the target machine.
+    #
+    # Must be defined by implementation classes
+    def run_chef(transport, config_generator)
+      raise NotImplementedError
+    end
+
     # A logger object that can be used to emit debugging info.
     def log
       Chef::Log

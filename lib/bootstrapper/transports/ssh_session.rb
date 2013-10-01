@@ -27,7 +27,7 @@ module Bootstrapper
         result
       end
 
-      def pty_run(command)
+      def pty_run(command, quiet=false)
         exit_status = nil
         session.open_channel do |channel|
           channel.request_pty
@@ -39,7 +39,7 @@ module Bootstrapper
               if data =~ /^SUDO PASSWORD FOR/
                 ichannel.send_data("#{get_password}\n")
               else
-                display(data)
+                display(data) unless quiet
               end
             end
             ch.on_request "exit-status" do |ichannel, data|
@@ -69,7 +69,7 @@ module Bootstrapper
       end
 
       def get_password
-        @password ||= ui.ask("sudo password for #{options.user}@#{remote_host}") { |q| q.echo = false }
+        @password ||= ui.ask("sudo password for #{options.user}@#{remote_host}}:") { |q| q.echo = false }
       end
 
       def remote_host

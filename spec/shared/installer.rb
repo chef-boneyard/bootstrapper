@@ -24,5 +24,10 @@ shared_examples_for "A Chef Installer" do
   it "implements #setup_files" do
     expect(installer).to respond_to(:setup_files)
   end
+
+  it "gives the chef-client binary to run" do
+    expect(installer.chef_client_command).to eq("chef-client")
+  end
+
 end
 

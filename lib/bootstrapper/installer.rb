@@ -55,5 +55,12 @@ module Bootstrapper
       raise NotImplementedError
     end
 
+    # Gives the base chef-client command to run (without any flags).
+    # This can be overridden by subclasses that install chef-client to a custom
+    # location.
+    def chef_client_command
+      "chef-client"
+    end
+
   end
 end
