@@ -1,10 +1,12 @@
 # BOOTSTRAPPER
 
 Bootstrapper is an in-progress replacement for Chef's `knife bootstrap`.
+It's capable of bootstrapping a host using omnibus packages and running
+chef-client on it, however, input validation and error messaging are
+minimal. This means that when things go wrong, you may need to read the
+code to understand why. If you're uncomfortable with this, you should
+probably avoid using it for now.
 
-**NOTE:** Big changes are in progress. Because there aren't yet any
-tests, I don't know if/how things are broken, but I assume that they
-are.
 
 ## Goals
 
@@ -27,18 +29,71 @@ though most users simply wish to customize the install process. By
 separating config generation, installation, and SSH session handling,
 each piece of functionality can be re-used or customized in isolation.
 
+## Design
+
+### Defining a Bootstrap
+
+The primary interface to _bootstrapper_ is a bootstrap definition file.
+This file specifies which components are used to bootstrap a host, and
+configures default settings for each component.
+
+A node is bootstrapped by three cooperating components:
+
+#### Transport
+
+Transport is an implementation of some remote command protocol. For Unix
+systems, this typically means SSH.
+
+#### Config Generator
+
+The config generator is responsible for generating any credentials and
+configuration needed to run Chef on the remote machine.
+
+The default `chef_client` config generator communicates with your Chef
+server to create a client identity and node object before the bootstrap
+runs, so use of the validator client is avoided.
+
+#### Installer
+
+The installer gets Chef installed on the remote box. The default
+installer uses the `install.sh` script to install an Omnibus package.
+This may change in the future.
+
+### Command Line
+
+Each bootstrap definition is compiled into a subcommand of the
+`bootstrap` command. For example, the default bootstrap definition in
+this source tree is named "omnibus_unix", so it is invoked by running
+(but see below for a caveat):
+
+    bootstrapper omnibus-unix [options]
+
+Each component declares a set of options that it supports. When a
+bootstrap is compiled into a subcommand, support for each option is
+added to the CLI, so that any option can be set on a per-invocation
+basis.
+
 ## Using It
 
-Use of this code is only recommended for users with experience writing
-knife plugins, on a test/development basis only.
+`bootstrapper` is only available via git for now. To install it:
 
-Knife currently supports only a single user plugins directory (more
-plugins can be installed as rubygems, though this code is not ready for
-that kind of release). To install the `knife strap` command, clone this
-repo to `~/.chef/plugins/bootstrapper`, then create a stub plugin in
-`~/.chef/plugins/knife/strap.rb`:
+1. git clone
+2. bundle install
 
-    load File.expand_path("../../bootstrapper/bin/strap.rb", __FILE__)
+`bootstrapper` currently does not read any bootstrap definitions by
+default (this will change). To see the options available in the default
+bootstrap from your git clone:
+
+    bundle exec bin/bootstrap -f lib/bootstrapper/bootstraps/default.rb -h # lists all known boostrap commands
+    bundle exec bin/bootstrap -f lib/bootstrapper/bootstraps/default.rb omnibus-unix -h # shows options for omnibus-unix bootstrap
+
+
+Note that `bootstrapper` is a standalone CLI program. Though it is
+intended to be used with Chef, it does not read any standard Chef
+configuration files. The only mechanism to set default values is in a
+bootstrap definition file. Since this file is pure ruby code, you can
+hack in some logic to set the default values if you need to. This
+limitation may change in the future.
 
 ## License:
 Apache 2 License.
