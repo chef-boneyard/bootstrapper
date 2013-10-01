@@ -1,4 +1,4 @@
-# Example of what a bootstrap definition might look like...
+# Basic Omnibus (install.sh) and chef-client install.
 Bootstrapper.define(:omnibus_unix) do |bootstrap|
   bootstrap.desc = "UNIX/SSH bootstrap"
   bootstrap.transport(:ssh) do |ssh|
