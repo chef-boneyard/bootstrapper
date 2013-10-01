@@ -47,6 +47,12 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
       expect(options_collection).to include([:run_list, opts])
     end
 
+    it "configures the desired environment" do
+      opts = {:type => :string,
+              :desc => "Set the chef environment of the created node"}
+      expect(options_collection).to include([:environment, opts])
+    end
+
   end
 
   context "when no node name is specified" do
@@ -102,6 +108,17 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
       options.run_list = %w{recipe[apache2] role[webserver]}
       node = config_generator.build_node
       expect(node.run_list).to eq(%w{recipe[apache2] role[webserver]})
+    end
+
+    it "builds a node with the _default environment by default" do
+      node = config_generator.build_node
+      expect(node.chef_environment).to eq("_default")
+    end
+
+    it "builds a node with the specified environment when configured" do
+      options.environment = "test"
+      node = config_generator.build_node
+      expect(node.chef_environment).to eq("test")
     end
 
     it "verifies that no node or client exists with the given name" do

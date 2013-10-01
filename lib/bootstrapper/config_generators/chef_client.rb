@@ -36,6 +36,10 @@ module Bootstrapper
              :type => :string,
              :desc => "Comma separated list of roles/recipes to apply"
 
+      option :environment,
+             :type => :string,
+             :desc => "Set the chef environment of the created node"
+
       attr_reader :client
       attr_reader :node
 
@@ -131,6 +135,7 @@ module Bootstrapper
         node = Chef::Node.build(entity_name)
         # TODO: wire up user-supplied run_list
         node.run_list(normalized_run_list)
+        node.environment(options.environment) if options.environment
         node
       end
 
