@@ -198,11 +198,9 @@ chef_server_url '#{options.chef_server_url}'
         ui.msg("Creating Chef config directory /etc/chef")
         # TODO: don't hardcode sudo
         ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT), true)
-bash -c '
   mkdir -p -m 0700 /etc/chef
   chown root:root /etc/chef
   chmod 0755 /etc/chef
-'
   SCRIPT
         files_to_install.each do |file|
           # TODO: support paths outside /etc/chef?
@@ -211,11 +209,9 @@ bash -c '
 
           # TODO: don't hardcode sudo
           ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT), true)
-bash -c '
   mv #{temp_path(file.rel_path)} #{final_path}
   chown root:root #{final_path}
   chmod #{file.mode} #{final_path}
-'
   SCRIPT
         end
       end

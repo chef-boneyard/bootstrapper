@@ -65,7 +65,7 @@ module Bootstrapper
       end
 
       def sudo(cmd)
-        "sudo -p 'SUDO PASSWORD FOR #{remote_host}:' #{cmd}"
+        "sudo -p 'SUDO PASSWORD FOR #{remote_host}:' '#{cmd}'"
       end
 
       def get_password
