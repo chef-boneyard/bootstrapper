@@ -199,7 +199,8 @@ chef_server_url '#{options.chef_server_url}'
         # TODO: don't hardcode sudo
         ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT), true)
   mkdir -p -m 0700 /etc/chef
-  chown root:root /etc/chef
+  chown root /etc/chef
+  chgrp root /etc/chef
   chmod 0755 /etc/chef
   SCRIPT
         files_to_install.each do |file|
@@ -210,7 +211,8 @@ chef_server_url '#{options.chef_server_url}'
           # TODO: don't hardcode sudo
           ssh_session.pty_run(ssh_session.sudo(<<-SCRIPT), true)
   mv #{temp_path(file.rel_path)} #{final_path}
-  chown root:root #{final_path}
+  chown root #{final_path}
+  chgrp root #{final_path}
   chmod #{file.mode} #{final_path}
   SCRIPT
         end
