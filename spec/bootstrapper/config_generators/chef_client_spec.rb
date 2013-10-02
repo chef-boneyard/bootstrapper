@@ -218,20 +218,20 @@ describe Bootstrapper::ConfigGenerators::ChefClient do
       config_generator.stage_files(transport)
 
       create_chef_dir=<<-EOH
-  mkdir -p -m 0700 /etc/chef;  \
-  chown root /etc/chef;        \
-  chgrp root /etc/chef;        \
-  chmod 0755 /etc/chef
+  mkdir -p -m 0700 /etc/chef || exit 1;  \
+  chown root /etc/chef || exit 1;        \
+  chgrp root /etc/chef;                  \
+  chmod 0755 /etc/chef || exit 1
 EOH
 
       transport.should_receive(:sudo).with(create_chef_dir).and_return("sudo #{create_chef_dir}")
       transport.should_receive(:pty_run).with("sudo #{create_chef_dir}", true)
 
       move_staged_file=<<-EOH
-  mv #{staging_dir}/test.sh /etc/chef/test.sh;   \
-  chown root /etc/chef/test.sh;                       \
-  chgrp root /etc/chef/test.sh;                       \
-  chmod 0600 /etc/chef/test.sh
+  mv #{staging_dir}/test.sh /etc/chef/test.sh || exit 1;   \
+  chown root /etc/chef/test.sh || exit 1;                       \
+  chgrp root /etc/chef/test.sh;                                 \
+  chmod 0600 /etc/chef/test.sh || exit 1
 EOH
 
       sudo_move_staged_file = "sudo #{move_staged_file}"
