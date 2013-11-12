@@ -17,4 +17,3 @@ Bootstrapper.define(:omnibus_unix) do |bootstrap|
     chef.chef_api_key = "~/.chef/kallistec.pem"
   end
 end
-
